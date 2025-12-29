@@ -15,12 +15,12 @@ START:
 	CALL	INITIALISE_INTERRUPT	; IM2 with ROM trick
 	CALL 	INITIAL_SETUP
 
-ANIMATE_MAIN:
+SP_MAIN:
 	HALT							; wait for vblank
 	CALL	VBLANK_PERIOD_WORK		; 8 scanline * 224 = 1952 t-states (minus some for alignment timing)
 	CALL	TOP_BORDER_RENDER		; timining-critical flipping of top border colours
 	CALL 	STACK_RENDER
-	JP		ANIMATE_MAIN
+	JP		SP_MAIN
 
 INITIAL_SETUP:
 	; black border
@@ -103,6 +103,14 @@ INTERRUPT:
 	; pop af
 	EI                               ; Enable interrupts
 	RET                              ; INTERRUPT
+
+; pre-blank attrs to black to avoid loading stutter
+	ORG			ATTR_START
+	DEFS		768, 0
+
+; hack this on (and attr above off, and actual rendering...) to test basic image
+;	ORG 		SCREEN_START
+;	INCBIN      "night_cat.scr"
 
 ; Deployment: Snapshot
    SAVESNA 	"StackPort.sna", START

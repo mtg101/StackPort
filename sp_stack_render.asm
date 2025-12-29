@@ -1,4 +1,5 @@
 
+	INCLUDE 	"sp_stack_render_data.asm"
 
 FAKE_PLACEHOLDER:
 	DEFW		0
@@ -10,9 +11,32 @@ STACK_RENDER:														; 17 T (call)
 	; preserve SP
 	LD 			(STACK_POINTER_BACKUP), SP							; 20 T
 
+	; loop setup
+	LD 			B, 192												; 7 T
 
 ; blit a row
+STACK_RENDER_ROW:
+	; screen address end of row +1 (PUSH pre drcrements)
+	LD			L, B												; 4 T
+    LD 			H, 0												; 7 T
+    ADD 		HL, HL      ; 2 byte adresses						; 11 T
+    LD 			DE, SCREEN_LUT ; DE = Base of table					; 10
+    ADD 		HL, DE      ; HL points to screen addr				; 11 T
+    
+    LD 			A, (HL)       ; Get Low Byte of address				; 7 T
+    INC 		HL													; 6 T
+    LD 			H, (HL)      ; Get High Byte of address				; 7 T
+    LD 			L, A												; 4 T
+    
+    LD 			(STACK_SCREEN_PTR), HL ; save it					; 16 T 
+																	; = 83 T to get screen address
 
+	; .scr/image address
+	LD 			(STACK_IMAGE_PTR), 									; 16 T
+																	; ??? T to get image addr
+
+
+	; actual blit...
 
 	; set SP to start of source row
 	LD 			SP, FAKE_PLACEHOLDER								; 20 T
@@ -33,7 +57,6 @@ STACK_RENDER:														; 17 T (call)
 	POP 		DE 													; 10 T
 	POP 		HL													; 10 T
 
-	; set SP to end of screen row
 	LD  		SP, FAKE_PLACEHOLDER								; 20 T
 
 	; push from shadow registers to screen
@@ -52,7 +75,9 @@ STACK_RENDER:														; 17 T (call)
 	PUSH 		BC 													; 11 T
 	PUSH 		AF 													; 11 T
 
+																	; 224 =  T for actual blit
 
+	DJNZ		STACK_RENDER_ROW									; 13 T (8 on last but meh)
 
 
 	; restore SP
@@ -96,11 +121,21 @@ STACK_RENDER:														; 17 T (call)
 	; but... can if we only do lower screen
 
 ; per row with the extras...
-	; 
+	; calc screen ptr: 83
+	; cal image ptr: ???
+	; actual blit: 224
+	; loop overhead... 13 T per DJNZ (ignore the 8 T on the last row...) 
+	; = ??? + 297 T total
 
+; total 192  with extras...
+	; ??? T per row
+	; 192 * ??? = 
+	; + 67 T main overhead
+	; + 7 setup B for loop
+	; total = ??? T
 
 ; floating bus racing the beam 
-; (what this demo uses)
+; (not using this as it's better for bottom half of screen)
 	; we start rendering as soon as main screen draw is (basically) over
 	; 56 bottom border
 	; 8 vblank
@@ -110,7 +145,7 @@ STACK_RENDER:														; 17 T (call)
 	;
 
 ; chasing the beam
-; (not used, but in theory...)
+; (using this as we need all the scanlines chasing the beam)
 	; using HALT not floating bus
 	; and timing 8 vblank & 56 top border away
 	; then have all 192 main screen plus 56 bottom border before HALT
@@ -120,3 +155,8 @@ STACK_RENDER:														; 17 T (call)
 STACK_POINTER_BACKUP:
 	DEFW 		0
 
+STACK_SCREEN_PTR:
+	DEFW 		0
+
+STACK_IMAGE_PTR:
+	DEFW 		0
