@@ -106,7 +106,7 @@ INTERRUPT:
 
 ; pre-blank attrs to black to avoid loading stutter
 	ORG			ATTR_START
-	DEFS		768, 0
+	DEFS		768, %00000111		; white ink, black pap
 
 ; hack this on (and attr above off, and actual rendering...) to test basic image
 ;	ORG 		SCREEN_START
