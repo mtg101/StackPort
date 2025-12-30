@@ -10,6 +10,8 @@
 	INCLUDE "speccy_defs.asm"		; must be indented
 	INCLUDE "sp_stack_render.asm"	
 	INCLUDE "sp_top_border.asm"	
+	INCLUDE "sp_user_input.asm"	
+	INCLUDE "sp_smc.asm"	
 	
 START:
 	CALL	INITIALISE_INTERRUPT	; IM2 with ROM trick
@@ -19,7 +21,7 @@ SP_MAIN:
 	HALT							; wait for vblank
 	CALL	VBLANK_PERIOD_WORK		; 8 scanline * 224 = 1952 t-states (minus some for alignment timing)
 	CALL	TOP_BORDER_RENDER		; timining-critical flipping of top border colours
-	CALL 	STACK_RENDER
+	CALL 	FRAME_ENGINE
 	JP		SP_MAIN
 
 INITIAL_SETUP:
@@ -28,6 +30,31 @@ INITIAL_SETUP:
 	OUT		($FE), A		
 
 	RET								; INITIAL_SETUP
+
+FRAME_COUNT:
+	DEFB 	0
+
+FRAME_ENGINE:
+	LD 		A, (FRAME_COUNT)
+	AND    	%00000001
+
+	CP		1
+	JP 		Z, FRAME_1
+
+FRAME_0:
+	CALL 	STACK_RENDER
+	JP		FRAME_DONE
+
+FRAME_1:
+	CALL 	USER_INPUT
+	CALL 	SMC_PORT
+
+FRAME_DONE:
+	; increment (21 T vs 30 T for LD A, (), INC A, LD (), A)
+	LD 		HL, FRAME_COUNT
+	INC 	(HL)
+
+	RET 							; FRAME_ENGINE
 
 ; 8 scanline * 224 = 1,752 t-states (minus some for alignment, push/pop, calls, etc...)
 ; we use it to flicker a window's colour based on pre-calculated stuff 
