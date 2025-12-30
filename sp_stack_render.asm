@@ -105,6 +105,7 @@ STACK_RENDER:														; 17 T (call)
 	; preserve SP
 	LD 			(STACK_POINTER_BACKUP), SP							; 20 T
 
+STACK_RENDER_PIXELS:
 	; 192 rows @ 204 T each
 	Stack_Row_Pixel 0
 	Stack_Row_Pixel 1
@@ -299,6 +300,7 @@ STACK_RENDER:														; 17 T (call)
 	Stack_Row_Pixel 190
 	Stack_Row_Pixel 191
 
+STACK_RENDER_ATTRS:
 	; 24 (block) rows @ 204 T each
 	Stack_Row_Attr 0
 	Stack_Row_Attr 1
