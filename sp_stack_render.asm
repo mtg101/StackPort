@@ -361,13 +361,3 @@ STACK_RENDER_ATTRS:
 STACK_POINTER_BACKUP:
 	DEFW 		0
 
-; start of image row
-STACK_IMAGE_OFFSET:
-	DEFB		8
-
-; end of screen row (stack shit)
-STACK_SCREEN_OFFSET:
-	DEFB		8 + 16
-
-STACK_SCREEN_SP:
-	DEFW		0
