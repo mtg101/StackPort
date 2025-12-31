@@ -47,7 +47,6 @@ FRAME_0:
 
 FRAME_1:
 	CALL 	USER_INPUT
-	CALL 	SMC_PORT
 
 FRAME_DONE:
 	; increment (21 T vs 30 T for LD A, (), INC A, LD (), A)

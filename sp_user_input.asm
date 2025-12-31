@@ -29,7 +29,9 @@ MOVE_VIEWPORT_LEFT:
     DEC     A
     LD      (VIEWPORT_OFFSET), A
 
-z    RET                             ; MOVE_VIEWPORT_LEFT
+    CALL    SMC_PORT_LEFT
+
+    RET                             ; MOVE_VIEWPORT_LEFT
 
 MOVE_VIEWPORT_RIGHT:
     LD      A, (VIEWPORT_OFFSET)
@@ -38,6 +40,8 @@ MOVE_VIEWPORT_RIGHT:
 
     INC     A
     LD      (VIEWPORT_OFFSET), A
+
+    CALL    SMC_PORT_RIGHT
 
     RET                             ; MOVE_VIEWPORT_RIGHT
 
