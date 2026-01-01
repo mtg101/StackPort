@@ -221,9 +221,60 @@ SMC_VIEWPORT_BUFFER_SWITCH:
     RET                     ; SMC_VIEWPORT_BUFFER_SWITCH 
 
 SMC_VIEWPORT:
-    ; nope not yet!!!!!!!!!!!!!!!!!!!!! hack
-    LD      A, 1
-    LD      (VIEWPORT_BUFFER), A
+    ; source attrs
+    LD      B, 24           ; 24 attr rows
+    LD      HL, STACK_RENDER_ATTRS + 1   ; +1 to start of LE addr
+    LD      DE, IMAGE_ROW_ATTR_0
+SMC_VIEWPORT_ATTR_SOURCE_LOOP:
+    ; save new
+    LD      (HL), E         ; LE                        ; 7 T
+    INC     HL                                          ; 6 T
+    LD      (HL), D         ; saved                     ; 7 T
+
+    ; move to next source row - DE + 32
+    PUSH    HL              ; remember                  ; 11 T
+    LD      HL, 16          ; adding 32                 ; 10 T
+    ADD     HL, DE          ; add it                    ; 11 T
+    EX      DE, HL          ; back in DE                ; 4 T
+    POP     HL              ; restore HL                ; 10 T
+
+    ; move to next to SMC - HL + 26
+    DEC     HL                                          ; 6 T
+    PUSH    DE
+    LD      DE, 26          ; next instruction to       ; 10 T
+                            ; modify is 26 bytes away
+    ADD     HL, DE                                      ; 11 T
+    POP     DE
+
+    DJNZ    SMC_VIEWPORT_ATTR_SOURCE_LOOP             ; 13 T (8 T)
+
+    ; source pixels
+    LD      B, 192           ; 192 pixel rows
+    LD      HL, STACK_RENDER_PIXELS + 1   ; +1 to start of LE addr
+    LD      DE, STACK_RENDER_BUFFER_PIXEL_ROW_0
+SMC_VIEWPORT_PIXEL_SOURCE_LOOP:
+    ; save new
+    LD      (HL), E         ; LE                        ; 7 T
+    INC     HL                                          ; 6 T
+    LD      (HL), D         ; saved                     ; 7 T
+
+    ; move to next source row
+    PUSH    HL              ; remember                  ; 11 T
+    LD      HL, 16          ; adding 16                 ; 10 T
+    ADD     HL, DE          ; add it                    ; 11 T
+    EX      DE, HL          ; back in DE                ; 4 T
+    POP     HL              ; restore HL                ; 10 T
+
+    ; move to next to SMC
+    DEC     HL                                          ; 6 T
+    PUSH    DE
+    LD      DE, 26          ; next instruction to       ; 10 T
+                            ; modify is 26 bytes away
+    ADD     HL, DE                                      ; 11 T
+    POP     DE
+
+    DJNZ    SMC_VIEWPORT_PIXEL_SOURCE_LOOP                   ; 13 T (8 T)
+
     RET                     ; SMC_VIEWPORT
 
 SMC_BUFFER:
