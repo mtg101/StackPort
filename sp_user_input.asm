@@ -19,6 +19,12 @@ USER_INPUT:
 	BIT 	2, A 					; x
 	CALL 	Z, MOVE_VIEWPORT_RIGHT
 
+	LD 		BC, $DFFE				; P	O	I	U	Y
+	IN 		A, (C)
+
+	BIT 	0, A 					; p
+	CALL 	Z, VIEWPORT_BUFFER_FLIP
+
 	RET 							; USER_INPUT
 
 MOVE_VIEWPORT_LEFT:
@@ -45,7 +51,18 @@ MOVE_VIEWPORT_RIGHT:
 
     RET                             ; MOVE_VIEWPORT_RIGHT
 
+VIEWPORT_BUFFER_FLIP:
+    LD      A, (VIEWPORT_BUFFER)
+    XOR     %00000001               ; flip last bit
+    LD      (VIEWPORT_BUFFER), A
+
+    RET                             ; VIEWPORT_BUFFER_FLIP
+
 ; screen block offset 0-23
 ; starts at 8 to match sp_stack_render_data.asm defaults
 VIEWPORT_OFFSET:
     DEFB    8
+
+; 0 means viewport, otherwise buffer
+VIEWPORT_BUFFER:
+    DEFB    0

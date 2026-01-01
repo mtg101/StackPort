@@ -1,102 +1,7 @@
 
 	INCLUDE 	"sp_stack_render_data.asm"
+	INCLUDE 	"sp_stack_render_macros.asm"
 
-
-	MACRO 		Stack_Row_Pixel	   row_num									; total 204 T
-		; start of screen row
-		LD 			SP, IMAGE_ROW_row_num								; 10 T
-																			; = 10 T
-
-		; pop from source to registers
-		POP 		AF 													; 10 T
-		POP 		BC 													; 10 T
-		POP 		DE 													; 10 T
-		POP 		HL													; 10 T
-																			; = 40 T
-
-		; flip to shadow registers
-		EXX 															; 4 T
-		EX AF															; 4 T
-																			; = 8 T
-
-		; pop from source to shadow registers
-		POP 		AF 													; 10 T
-		POP 		BC 													; 10 T
-		POP 		DE 													; 10 T
-		POP 		HL													; 10 T
-																			; = 40 T
-
-		; set SP to end of screen row
-		LD 			SP, SCREEN_ROW_row_num								; 10 T
-																			; = 10 T
-	
-		; push from shadow registers to screen
-		PUSH 		HL 													; 11 T
-		PUSH 		DE 													; 11 T
-		PUSH 		BC 													; 11 T
-		PUSH 		AF 													; 11 T
-																			; = 44 T
-
-		; flip back to regular registers
-		EXX 															; 4 T
-		EX AF															; 4 T
-																			; = 8 T
-
-		; push from registers to screen
-		PUSH 		HL 													; 11 T
-		PUSH 		DE 													; 11 T
-		PUSH 		BC 													; 11 T
-		PUSH 		AF 													; 11 T
-																			; = 44 T
-	ENDM 
-
-	MACRO 		Stack_Row_Attr		row_num								; total 204 T
-		; start of screen row
-		LD 			SP, IMAGE_ROW_ATTR_row_num							; 10 T
-																			; = 10 T
-
-		; pop from source to registers
-		POP 		AF 													; 10 T
-		POP 		BC 													; 10 T
-		POP 		DE 													; 10 T
-		POP 		HL													; 10 T
-																			; = 40 T
-
-		; flip to shadow registers
-		EXX 															; 4 T
-		EX AF															; 4 T
-																			; = 8 T
-
-		; pop from source to shadow registers
-		POP 		AF 													; 10 T
-		POP 		BC 													; 10 T
-		POP 		DE 													; 10 T
-		POP 		HL													; 10 T
-																			; = 40 T
-
-		; set SP to end of screen row
-		LD 			SP, SCREEN_ROW_ATTR_row_num							; 10 T
-																			; = 10 T
-	
-		; push from shadow registers to screen
-		PUSH 		HL 													; 11 T
-		PUSH 		DE 													; 11 T
-		PUSH 		BC 													; 11 T
-		PUSH 		AF 													; 11 T
-																			; = 44 T
-
-		; flip back to regular registers
-		EXX 															; 4 T
-		EX AF															; 4 T
-																			; = 8 T
-
-		; push from registers to screen
-		PUSH 		HL 													; 11 T
-		PUSH 		DE 													; 11 T
-		PUSH 		BC 													; 11 T
-		PUSH 		AF 													; 11 T
-																			; = 44 T
-	ENDM 
 
 STACK_RENDER:														; 17 T (call)
 	; push any registers we need to preserve...
@@ -334,8 +239,253 @@ STACK_RENDER_ATTRS:
 	; none for now
 	RET								; STACK_RENDER					; 10 T
 		; overhead: 17 + 20 + 20 + 10 = 67 T
-		; rows 192 * 204 = 39,168 T
-		; total = 39,235 T
+		; pixel rows 192 * 204 = 39,168 T
+		; attr row 24 * 204 = 4,896 T
+		; total = 44,131 T
+
+
+
+STACK_RENDER_BUFFER:												; 17 T (call)
+	; push any registers we need to preserve...
+	; none for now
+
+	; preserve SP
+	LD 			(STACK_POINTER_BACKUP), SP							; 20 T
+
+STACK_RENDER_BUFFER_PIXELS:
+	; 192 rows @ ??? T each
+	Stack_Row_Buffer_Pixel 0
+	Stack_Row_Buffer_Pixel 1
+	Stack_Row_Buffer_Pixel 2
+	Stack_Row_Buffer_Pixel 3
+	Stack_Row_Buffer_Pixel 4
+	Stack_Row_Buffer_Pixel 5
+	Stack_Row_Buffer_Pixel 6
+	Stack_Row_Buffer_Pixel 7
+	Stack_Row_Buffer_Pixel 8
+	Stack_Row_Buffer_Pixel 9
+	Stack_Row_Buffer_Pixel 10
+	Stack_Row_Buffer_Pixel 11
+	Stack_Row_Buffer_Pixel 12
+	Stack_Row_Buffer_Pixel 13
+	Stack_Row_Buffer_Pixel 14
+	Stack_Row_Buffer_Pixel 15
+	Stack_Row_Buffer_Pixel 16
+	Stack_Row_Buffer_Pixel 17
+	Stack_Row_Buffer_Pixel 18
+	Stack_Row_Buffer_Pixel 19
+	Stack_Row_Buffer_Pixel 20
+	Stack_Row_Buffer_Pixel 21
+	Stack_Row_Buffer_Pixel 22
+	Stack_Row_Buffer_Pixel 23
+	Stack_Row_Buffer_Pixel 24
+	Stack_Row_Buffer_Pixel 25
+	Stack_Row_Buffer_Pixel 26
+	Stack_Row_Buffer_Pixel 27
+	Stack_Row_Buffer_Pixel 28
+	Stack_Row_Buffer_Pixel 29
+	Stack_Row_Buffer_Pixel 30
+	Stack_Row_Buffer_Pixel 31
+	Stack_Row_Buffer_Pixel 32
+	Stack_Row_Buffer_Pixel 33
+	Stack_Row_Buffer_Pixel 34
+	Stack_Row_Buffer_Pixel 35
+	Stack_Row_Buffer_Pixel 36
+	Stack_Row_Buffer_Pixel 37
+	Stack_Row_Buffer_Pixel 38
+	Stack_Row_Buffer_Pixel 39
+	Stack_Row_Buffer_Pixel 40
+	Stack_Row_Buffer_Pixel 41
+	Stack_Row_Buffer_Pixel 42
+	Stack_Row_Buffer_Pixel 43
+	Stack_Row_Buffer_Pixel 44
+	Stack_Row_Buffer_Pixel 45
+	Stack_Row_Buffer_Pixel 46
+	Stack_Row_Buffer_Pixel 47
+	Stack_Row_Buffer_Pixel 48
+	Stack_Row_Buffer_Pixel 49
+	Stack_Row_Buffer_Pixel 50
+	Stack_Row_Buffer_Pixel 51
+	Stack_Row_Buffer_Pixel 52
+	Stack_Row_Buffer_Pixel 53
+	Stack_Row_Buffer_Pixel 54
+	Stack_Row_Buffer_Pixel 55
+	Stack_Row_Buffer_Pixel 56
+	Stack_Row_Buffer_Pixel 57
+	Stack_Row_Buffer_Pixel 58
+	Stack_Row_Buffer_Pixel 59
+	Stack_Row_Buffer_Pixel 60
+	Stack_Row_Buffer_Pixel 61
+	Stack_Row_Buffer_Pixel 62
+	Stack_Row_Buffer_Pixel 63
+	Stack_Row_Buffer_Pixel 64
+	Stack_Row_Buffer_Pixel 65
+	Stack_Row_Buffer_Pixel 66
+	Stack_Row_Buffer_Pixel 67
+	Stack_Row_Buffer_Pixel 68
+	Stack_Row_Buffer_Pixel 69
+	Stack_Row_Buffer_Pixel 70
+	Stack_Row_Buffer_Pixel 71
+	Stack_Row_Buffer_Pixel 72
+	Stack_Row_Buffer_Pixel 73
+	Stack_Row_Buffer_Pixel 74
+	Stack_Row_Buffer_Pixel 75
+	Stack_Row_Buffer_Pixel 76
+	Stack_Row_Buffer_Pixel 77
+	Stack_Row_Buffer_Pixel 78
+	Stack_Row_Buffer_Pixel 79
+	Stack_Row_Buffer_Pixel 80
+	Stack_Row_Buffer_Pixel 81
+	Stack_Row_Buffer_Pixel 82
+	Stack_Row_Buffer_Pixel 83
+	Stack_Row_Buffer_Pixel 84
+	Stack_Row_Buffer_Pixel 85
+	Stack_Row_Buffer_Pixel 86
+	Stack_Row_Buffer_Pixel 87
+	Stack_Row_Buffer_Pixel 88
+	Stack_Row_Buffer_Pixel 89
+	Stack_Row_Buffer_Pixel 90
+	Stack_Row_Buffer_Pixel 91
+	Stack_Row_Buffer_Pixel 92
+	Stack_Row_Buffer_Pixel 93
+	Stack_Row_Buffer_Pixel 94
+	Stack_Row_Buffer_Pixel 95
+	Stack_Row_Buffer_Pixel 96
+	Stack_Row_Buffer_Pixel 97
+	Stack_Row_Buffer_Pixel 98
+	Stack_Row_Buffer_Pixel 99
+	Stack_Row_Buffer_Pixel 100
+	Stack_Row_Buffer_Pixel 101
+	Stack_Row_Buffer_Pixel 102
+	Stack_Row_Buffer_Pixel 103
+	Stack_Row_Buffer_Pixel 104
+	Stack_Row_Buffer_Pixel 105
+	Stack_Row_Buffer_Pixel 106
+	Stack_Row_Buffer_Pixel 107
+	Stack_Row_Buffer_Pixel 108
+	Stack_Row_Buffer_Pixel 109
+	Stack_Row_Buffer_Pixel 110
+	Stack_Row_Buffer_Pixel 111
+	Stack_Row_Buffer_Pixel 112
+	Stack_Row_Buffer_Pixel 113
+	Stack_Row_Buffer_Pixel 114
+	Stack_Row_Buffer_Pixel 115
+	Stack_Row_Buffer_Pixel 116
+	Stack_Row_Buffer_Pixel 117
+	Stack_Row_Buffer_Pixel 118
+	Stack_Row_Buffer_Pixel 119
+	Stack_Row_Buffer_Pixel 120
+	Stack_Row_Buffer_Pixel 121
+	Stack_Row_Buffer_Pixel 122
+	Stack_Row_Buffer_Pixel 123
+	Stack_Row_Buffer_Pixel 124
+	Stack_Row_Buffer_Pixel 125
+	Stack_Row_Buffer_Pixel 126
+	Stack_Row_Buffer_Pixel 127
+	Stack_Row_Buffer_Pixel 128
+	Stack_Row_Buffer_Pixel 129
+	Stack_Row_Buffer_Pixel 130
+	Stack_Row_Buffer_Pixel 131
+	Stack_Row_Buffer_Pixel 132
+	Stack_Row_Buffer_Pixel 133
+	Stack_Row_Buffer_Pixel 134
+	Stack_Row_Buffer_Pixel 135
+	Stack_Row_Buffer_Pixel 136
+	Stack_Row_Buffer_Pixel 137
+	Stack_Row_Buffer_Pixel 138
+	Stack_Row_Buffer_Pixel 139
+	Stack_Row_Buffer_Pixel 140
+	Stack_Row_Buffer_Pixel 141
+	Stack_Row_Buffer_Pixel 142
+	Stack_Row_Buffer_Pixel 143
+	Stack_Row_Buffer_Pixel 144
+	Stack_Row_Buffer_Pixel 145
+	Stack_Row_Buffer_Pixel 146
+	Stack_Row_Buffer_Pixel 147
+	Stack_Row_Buffer_Pixel 148
+	Stack_Row_Buffer_Pixel 149
+	Stack_Row_Buffer_Pixel 150
+	Stack_Row_Buffer_Pixel 151
+	Stack_Row_Buffer_Pixel 152
+	Stack_Row_Buffer_Pixel 153
+	Stack_Row_Buffer_Pixel 154
+	Stack_Row_Buffer_Pixel 155
+	Stack_Row_Buffer_Pixel 156
+	Stack_Row_Buffer_Pixel 157
+	Stack_Row_Buffer_Pixel 158
+	Stack_Row_Buffer_Pixel 159
+	Stack_Row_Buffer_Pixel 160
+	Stack_Row_Buffer_Pixel 161
+	Stack_Row_Buffer_Pixel 162
+	Stack_Row_Buffer_Pixel 163
+	Stack_Row_Buffer_Pixel 164
+	Stack_Row_Buffer_Pixel 165
+	Stack_Row_Buffer_Pixel 166
+	Stack_Row_Buffer_Pixel 167
+	Stack_Row_Buffer_Pixel 168
+	Stack_Row_Buffer_Pixel 169
+	Stack_Row_Buffer_Pixel 170
+	Stack_Row_Buffer_Pixel 171
+	Stack_Row_Buffer_Pixel 172
+	Stack_Row_Buffer_Pixel 173
+	Stack_Row_Buffer_Pixel 174
+	Stack_Row_Buffer_Pixel 175
+	Stack_Row_Buffer_Pixel 176
+	Stack_Row_Buffer_Pixel 177
+	Stack_Row_Buffer_Pixel 178
+	Stack_Row_Buffer_Pixel 179
+	Stack_Row_Buffer_Pixel 180
+	Stack_Row_Buffer_Pixel 181
+	Stack_Row_Buffer_Pixel 182
+	Stack_Row_Buffer_Pixel 183
+	Stack_Row_Buffer_Pixel 184
+	Stack_Row_Buffer_Pixel 185
+	Stack_Row_Buffer_Pixel 186
+	Stack_Row_Buffer_Pixel 187
+	Stack_Row_Buffer_Pixel 188
+	Stack_Row_Buffer_Pixel 189
+	Stack_Row_Buffer_Pixel 190
+	Stack_Row_Buffer_Pixel 191
+
+STACK_RENDER_BUFFER_ATTRS:
+	; 24 (block) rows @ 204 T each
+	Stack_Row_Buffer_Attr 0
+	Stack_Row_Buffer_Attr 1
+	Stack_Row_Buffer_Attr 2
+	Stack_Row_Buffer_Attr 3
+	Stack_Row_Buffer_Attr 4
+	Stack_Row_Buffer_Attr 5
+	Stack_Row_Buffer_Attr 6
+	Stack_Row_Buffer_Attr 7
+	Stack_Row_Buffer_Attr 8
+	Stack_Row_Buffer_Attr 9
+	Stack_Row_Buffer_Attr 10
+	Stack_Row_Buffer_Attr 11
+	Stack_Row_Buffer_Attr 12
+	Stack_Row_Buffer_Attr 13
+	Stack_Row_Buffer_Attr 14
+	Stack_Row_Buffer_Attr 15
+	Stack_Row_Buffer_Attr 16
+	Stack_Row_Buffer_Attr 17
+	Stack_Row_Buffer_Attr 18
+	Stack_Row_Buffer_Attr 19
+	Stack_Row_Buffer_Attr 20
+	Stack_Row_Buffer_Attr 21
+	Stack_Row_Buffer_Attr 22
+	Stack_Row_Buffer_Attr 23
+
+	; restore SP
+	LD 			SP, (STACK_POINTER_BACKUP)							; 20 T
+
+	; pop any registers we need to restore...
+	; none for now
+	RET								; STACK_RENDER					; 10 T
+		; overhead: 17 + 20 + 20 + 10 = 67 T
+		; pixel rows 192 * 204 = 39,168 T
+		; attr row 24 * 204 = 4,896 T
+		; total = 44,131 T
+
+
 
 
 ; chasing the beam
