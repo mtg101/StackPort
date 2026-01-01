@@ -32,10 +32,11 @@ MOVE_VIEWPORT_LEFT:
     CP      0
     RET     Z                       ; already at most left
 
+    CALL    SMC_PORT_LEFT
+
+    LD      A, (VIEWPORT_OFFSET)
     DEC     A
     LD      (VIEWPORT_OFFSET), A
-
-    CALL    SMC_PORT_LEFT
 
     RET                             ; MOVE_VIEWPORT_LEFT
 
@@ -44,10 +45,11 @@ MOVE_VIEWPORT_RIGHT:
     CP      16
     RET     Z                       ; already at most right
 
+    CALL    SMC_PORT_RIGHT
+
+    LD      A, (VIEWPORT_OFFSET)
     INC     A
     LD      (VIEWPORT_OFFSET), A
-
-    CALL    SMC_PORT_RIGHT
 
     RET                             ; MOVE_VIEWPORT_RIGHT
 

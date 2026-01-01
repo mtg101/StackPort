@@ -474,6 +474,124 @@ STACK_RENDER_BUFFER_ATTRS:
 	Stack_Row_Buffer_Attr 22
 	Stack_Row_Buffer_Attr 23
 
+STACK_RENDER_BUFFER_BLANK:
+	LD 		A, (STACK_RENDER_BLANK_COL)								; 13 T
+	CP 		$FF														; 7 T
+	JP 		Z, STACK_RENDER_BUFFER_DONE	; no blank needed			; 10 T
+																		; = 30 T
+	; blank attr the specified col
+	LD 		D, 0													; 7 T
+	LD 		E, A 						; DE has offset				; 4 T
+																		; = 11 T
+
+	; row 0
+	LD 		HL, SCREEN_ROW_ATTR_0 - 24	; point to initial col		; 10 T
+	ADD 	HL, DE						; HL has col to blank		; 11 T
+	LD 		(HL), 0						; blank it					; 10 T
+
+	LD 		DE, 32						; a row of screen attrs		; 10 T
+																		; = 41 T
+																			; = 82 T
+
+	; row 1
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 2
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 3
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 4
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 5
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 6
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 7
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 8
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 9
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 10
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 11
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 12
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 13
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 14
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 15
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 16
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 17
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 18
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 19
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 20
+	ADD 	HL, DE						; next row					
+	LD 		(HL), 0						; blank it					
+
+	; row 21
+	ADD 	HL, DE						; next row				
+	LD 		(HL), 0						; blank it				
+
+	; row 22
+	ADD 	HL, DE						; next row				
+	LD 		(HL), 0						; blank it				
+
+	; row 23
+	ADD 	HL, DE						; next row				; 11 T
+	LD 		(HL), 0						; blank it				; 10 T
+																	; = 21 T
+
+										; 23 (0th col separate) * 21 T
+																		; = 483 T
+																		; + 82 T
+																			; = 565 T
+
+STACK_RENDER_BUFFER_DONE:
 	; restore SP
 	LD 			SP, (STACK_POINTER_BACKUP)							; 20 T
 
@@ -483,7 +601,8 @@ STACK_RENDER_BUFFER_ATTRS:
 		; overhead: 17 + 20 + 20 + 10 = 67 T
 		; pixel rows 192 * 204 = 39,168 T
 		; attr row 24 * 204 = 4,896 T
-		; total = 44,131 T
+		; blanking col needed = 565 T
+		; total = 44,696 T
 
 
 
@@ -507,7 +626,10 @@ STACK_RENDER_BUFFER_ATTRS:
 	; = 26,880 t-states clear before real racing & contention kicks in...
 	;
 
-
 STACK_POINTER_BACKUP:
 	DEFW 		0
+
+; which col to blank when moving, 255 for do nothing
+STACK_RENDER_BLANK_COL:
+	DEFB 		$FF
 

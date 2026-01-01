@@ -4,6 +4,11 @@ SMC_PORT_LEFT:
     CP      0
     RET     Z               ; only doing buffer for now
 
+    ; need to clear a col
+    LD      A, (VIEWPORT_OFFSET)    ; moving left, clear current offset + 16
+    ADD     15
+    LD      (STACK_RENDER_BLANK_COL), A
+
     ; attrs
     LD      B, 24           ; 24 attr rows
     LD      HL, STACK_RENDER_BUFFER_ATTRS + 13 + 1   ; +13 to start of instruction, +1 to start of LE addr
@@ -33,6 +38,10 @@ SMC_PORT_RIGHT:
     LD      A, (VIEWPORT_BUFFER)
     CP      0
     RET     Z               ; only doing buffer for now
+
+    ; need to clear a col
+    LD      A, (VIEWPORT_OFFSET)    ; moving right, clear current offset
+    LD      (STACK_RENDER_BLANK_COL), A
 
     ; attrs
     LD      B, 24           ; 24 attr rows
