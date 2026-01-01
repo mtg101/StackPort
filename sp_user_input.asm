@@ -41,7 +41,7 @@ MOVE_VIEWPORT_LEFT:
 
 MOVE_VIEWPORT_RIGHT:
     LD      A, (VIEWPORT_OFFSET)
-    CP      23
+    CP      16
     RET     Z                       ; already at most right
 
     INC     A
@@ -65,4 +65,4 @@ VIEWPORT_OFFSET:
 
 ; 0 means viewport, otherwise buffer
 VIEWPORT_BUFFER:
-    DEFB    0
+    DEFB    1
