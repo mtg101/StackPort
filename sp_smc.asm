@@ -32,6 +32,29 @@ SMC_PORT_LEFT_ATTR_LOOP:
 
     DJNZ    SMC_PORT_LEFT_ATTR_LOOP                     ; 13 T (8 T)
 
+    ; pixels
+    LD      B, 192           ; 192 pixel rows
+    LD      HL, STACK_RENDER_BUFFER_PIXELS + 13 + 1   ; +13 to start of instruction, +1 to start of LE addr
+SMC_PORT_LEFT_PIXEL_LOOP:
+    ; load old
+    LD      E, (HL)         ; LE address                ; 7 T
+    INC     HL                                          ; 6 T
+    LD      D, (HL)         ; DE has addr               ; 7 T
+
+    ; dec
+    DEC     DE              ; DE moved right            ; 6 T
+
+    ; save new
+    LD      (HL), D         ; LE                        ; 7 T
+    DEC     HL                                          ; 6 T
+    LD      (HL), E         ; saved                     ; 7 T
+
+    LD      DE, 26          ; next instruction to       ; 10 T
+                            ; modify is 26 bytes away
+    ADD     HL, DE                                      ; 11 T
+
+    DJNZ    SMC_PORT_LEFT_PIXEL_LOOP                    ; 13 T (8 T)
+
     RET                     ; SMC_PORT_LEFT
 
 SMC_PORT_RIGHT:
@@ -65,6 +88,29 @@ SMC_PORT_RIGHT_ATTR_LOOP:
     ADD     HL, DE                                      ; 11 T
 
     DJNZ    SMC_PORT_RIGHT_ATTR_LOOP                    ; 13 T (8 T)
+
+    ; pixels
+    LD      B, 192           ; 192 pixel rows
+    LD      HL, STACK_RENDER_BUFFER_PIXELS + 13 + 1   ; +13 to start of instruction, +1 to start of LE addr
+SMC_PORT_RIGHT_PIXEL_LOOP:
+    ; load old
+    LD      E, (HL)         ; LE address                ; 7 T
+    INC     HL                                          ; 6 T
+    LD      D, (HL)         ; DE has addr               ; 7 T
+
+    ; inc
+    INC     DE              ; DE moved right            ; 6 T
+
+    ; save new
+    LD      (HL), D         ; LE                        ; 7 T
+    DEC     HL                                          ; 6 T
+    LD      (HL), E         ; saved                     ; 7 T
+
+    LD      DE, 26          ; next instruction to       ; 10 T
+                            ; modify is 26 bytes away
+    ADD     HL, DE                                      ; 11 T
+
+    DJNZ    SMC_PORT_RIGHT_PIXEL_LOOP                    ; 13 T (8 T)
 
     RET                     ; SMC_PORT_RIGHT
 
