@@ -11,13 +11,17 @@ USER_INPUT:
 	LD 		BC, $FEFE				; SHIFT	Z	X	C	V
 	IN 		A, (C)
 
-	PUSH	AF
 	BIT 	1, A 					; z
+	PUSH	AF
 	CALL 	Z, MOVE_VIEWPORT_LEFT
 	POP 	AF
+    RET     Z                       ; single action per frame
 
 	BIT 	2, A 					; x
+	PUSH	AF
 	CALL 	Z, MOVE_VIEWPORT_RIGHT
+	POP 	AF
+    RET     Z                       ; single action per frame
 
 	LD 		BC, $DFFE				; P	O	I	U	Y
 	IN 		A, (C)
@@ -58,6 +62,8 @@ VIEWPORT_BUFFER_FLIP:
     XOR     %00000001               ; flip last bit
     LD      (VIEWPORT_BUFFER), A
 
+    CALL    SMC_VIEWPORT_BUFFER_SWITCH
+
     RET                             ; VIEWPORT_BUFFER_FLIP
 
 ; screen block offset 0-23
@@ -67,4 +73,4 @@ VIEWPORT_OFFSET:
 
 ; 0 means viewport, otherwise buffer
 VIEWPORT_BUFFER:
-    DEFB    1
+    DEFB    0
