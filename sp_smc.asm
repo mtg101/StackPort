@@ -251,8 +251,31 @@ SMC_VIEWPORT_ATTR_SOURCE_LOOP:
     ; source pixels
     LD      B, 192           ; 192 pixel rows
     LD      HL, STACK_RENDER_PIXELS + 1   ; +1 to start of LE addr
-    LD      DE, STACK_RENDER_BUFFER_PIXEL_ROW_0
+    LD      C, 0             ; counts up our LUT offset
 SMC_VIEWPORT_PIXEL_SOURCE_LOOP:
+    ; LUT...
+    LD      DE, IMAGE_OFFSET_LUT    ; base LUT          ;  T
+
+    PUSH    HL              ; remember                  ; 11 T
+
+    LD      H, 0                                        ;  T
+    LD      L, C            ; our 0-191 LUT offset      ;  T
+
+    ADD     HL, DE          ; HL points to value in LUT ;  T
+
+    LD      D, (HL)                                     ;  T
+    INC     HL
+    LD      E, (HL)         ; DE has base value         ;  T
+
+    LD      A, (VIEWPORT_OFFSET)    ; offset...         ;  T
+    LD      H, 0                                        ;  T
+    LD      L, A            ; HL has offset             ;  T
+
+    ADD     HL, DE                                      ;  T
+    EX      DE, HL          ; DE had offset value       ;  T
+
+    POP     HL              ; restore HL                ; 10 T
+
     ; save new
     LD      (HL), E         ; LE                        ; 7 T
     INC     HL                                          ; 6 T
@@ -272,6 +295,8 @@ SMC_VIEWPORT_PIXEL_SOURCE_LOOP:
                             ; modify is 26 bytes away
     ADD     HL, DE                                      ; 11 T
     POP     DE
+
+    INC     C               ; our LUT offset            ; 4 T
 
     DJNZ    SMC_VIEWPORT_PIXEL_SOURCE_LOOP                   ; 13 T (8 T)
 
