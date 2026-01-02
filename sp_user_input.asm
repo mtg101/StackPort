@@ -27,7 +27,26 @@ USER_INPUT:
 	IN 		A, (C)
 
 	BIT 	0, A 					; p
+    PUSH    AF
 	CALL 	Z, VIEWPORT_BUFFER_FLIP
+    POP     AF 
+    RET     Z                       ; single action per frame
+
+	BIT 	1, A 					; o
+    PUSH    AF
+	CALL 	Z, SET_VIEWPORT
+    POP     AF 
+    RET     Z                       ; single action per frame
+
+	LD 		BC, $BFFE				; ENTER	L	K	J	H
+	IN 		A, (C)
+
+	BIT 	2, A 					; k
+    PUSH    AF
+	CALL 	Z, SET_BUFFER
+    POP     AF 
+    RET     Z                       ; single action per frame
+
 
 	RET 							; USER_INPUT
 
@@ -56,6 +75,30 @@ MOVE_VIEWPORT_RIGHT:
     LD      (VIEWPORT_OFFSET), A
 
     RET                             ; MOVE_VIEWPORT_RIGHT
+
+SET_VIEWPORT:
+    LD      A, (VIEWPORT_BUFFER)
+    CP      0
+    RET     Z                       ; already viewport
+
+    LD      A, 0                    ; set viewport
+    LD      (VIEWPORT_BUFFER), A
+
+    CALL    SMC_VIEWPORT
+
+    RET                             ; SET_VIEWPORT
+
+SET_BUFFER:
+    LD      A, (VIEWPORT_BUFFER)
+    CP      1
+    RET     Z                       ; already buffer
+
+    LD      A, 1                    ; set bufffer
+    LD      (VIEWPORT_BUFFER), A
+
+    CALL    SMC_BUFFER
+
+    RET                             ; SET_BUFFER
 
 VIEWPORT_BUFFER_FLIP:
     LD      A, (VIEWPORT_BUFFER)
